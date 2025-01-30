@@ -1,0 +1,2 @@
+set DJANGO_SETTINGS_MODULE=citydata.settings
+python import_csv.py

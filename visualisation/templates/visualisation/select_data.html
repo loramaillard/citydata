@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choisir les données pour {{ commune.libgeo }}</title>
+</head>
+<body>
+    <h1>Choisissez les données pour {{ commune.libgeo }}</h1>
+    <form method="post">
+        {% csrf_token %}
+        <ul>
+            {% for key, value in valid_fields.items %}
+                <li>   
+                    <label>
+                        <input type="checkbox" name="data_fields" value="{{ key }}">
+                        {{ value }}                    
+                    </label>
+               </li>
+            {% endfor %}
+        </ul>
+        <button type="submit">Afficher sur la carte</button>
+    </form>
+</body>
+</html>

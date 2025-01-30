@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carte Interactive pour {{ commune.libgeo }}</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <style>
+            .inline-links a {
+                display: inline-block;
+                margin-right: 15px;
+                text-decoration: underline;
+            }
+
+            .flex-links {
+                display: flex;
+                gap: 15px;
+            }
+    </style>
+</head>
+<body>
+    <h1>Carte Interactive pour {{ commune.libgeo }}</h1>
+    <div class="inline-links">
+        <a href="{% url 'visualisation:search_view' %}">Revenir à la recherche</a>
+        <a href="{% url 'visualisation:select_data' commune.id %}">Revenir à la sélection des données</a>       
+        <a href="{% url 'visualisation:population_pie_chart' commune.id %}">Voir la répartition de la population par âge</a>
+
+    </div>
+    <div id="map" style="width: 100%; height: 500px;"></div>
+    <script>
+        var map = L.map('map').setView([{{ commune.latitude_centre }}, {{ commune.longitude_centre }}], 12);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Ajouter le popup avec les données sélectionnées
+        var popupContent = `{{ popup_content|safe }}`;
+        var marker = L.marker([{{ commune.latitude_centre }}, {{ commune.longitude_centre }}]).addTo(map);
+        marker.bindPopup(popupContent).openPopup();
+    </script>
+    
+</body>
+</html>
