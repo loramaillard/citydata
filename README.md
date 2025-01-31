@@ -2,7 +2,7 @@
 
 **Ouvrez un terminal et clonez le projet :**
 
-git clone https://github.com/VOTRE-REPO.git
+git clone https://github.com/loramaillard/citydata.git
 
 cd VOTRE-REPO
 
