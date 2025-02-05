@@ -1,19 +1,22 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Commune
+from .models import Commune, Aeroport
 from .field_labels import field_labels
 from django.http import HttpResponse
-import folium  # Bibliothèque pour créer des cartes interactives
 import math
 from django.urls import reverse
 import matplotlib.pyplot as plt
 from io import BytesIO
 import base64
+from math import radians, sin, cos, sqrt, atan2
+#from django.contrib.gis.geos import Point
+#from django.contrib.gis.db.models.functions import Distance
 
 def search_view(request):
     query = request.GET.get('query', '')  # Récupérer la recherche de l'utilisateur
     communes = []
     if query:
-        communes = Commune.objects.filter(libgeo__icontains=query)  # Chercher les villes correspondant au nom
+        communes = Commune.objects.filter(libgeo__icontains=query).order_by('libgeo')  # Chercher les villes correspondant au nom
+
     return render(request, 'visualisation/search.html', {'query': query, 'communes': communes})
 
 
@@ -24,6 +27,7 @@ def select_data_view(request, commune_id):
 
     # Récupérer les champs du modèle Commune
     fields = [field.name for field in Commune._meta.get_fields() if not field.is_relation]
+    
     # Liste des champs à exclure
     excluded_fields = ['id', 'libgeo','codgeo','p21_pop0014','p21_pop1529','p21_pop3044','p21_pop4559'
                        ,'p21_pop6074','p21_pop7589','p21_pop90p','nombre_crime', 'latitude_centre', 'longitude_centre']
@@ -37,18 +41,14 @@ def select_data_view(request, commune_id):
         getattr(commune, field) not in [None, '', float('nan'),0] and 
         not (isinstance(getattr(commune, field), float) and math.isnan(getattr(commune, field)))
     }
-    
+    valid_fields["Aéroports"] = 0
+
     valid_fields_1 = {}
     for key in valid_fields.keys():
         valid_fields_1[key] = field_labels.get(key)
 
     valid_fields.update(valid_fields_1)    
 
-    # Créer un tableau contenant uniquement les labels correspondants aux clés de valid_fields
-    #valid_field_labels = [
-    #    field_labels.get(field, field) for field in valid_fields.keys()
-    #]
-    #print(valid_fields)
     if request.method == "POST":
         selected_fields = request.POST.getlist('data_fields')  # Cases sélectionnées
         request.session['selected_fields'] = selected_fields  # Sauvegarde des champs sélectionnés
@@ -58,6 +58,14 @@ def select_data_view(request, commune_id):
         'commune': commune,
         'valid_fields': valid_fields,
     })
+
+def haversine(lat1, lon1, lat2, lon2):
+    R = 6371000  # Rayon de la Terre en mètres
+    dlat = radians(lat2 - lat1)
+    dlon = radians(lon2 - lon1)
+    a = sin(dlat / 2)**2 + cos(radians(lat1)) * cos(radians(lat2)) * sin(dlon / 2)**2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+    return R * c  # Distance en mètres
 
 
 def map_view(request, commune_id):
@@ -78,12 +86,37 @@ def map_view(request, commune_id):
     # Si aucun champ sélectionné, ajouter un message par défaut
     if not popup_content:
         popup_content = "Aucune donnée sélectionnée."
+
+    aeroports_data=[]
+    # Recherche des aéroports si sélectionné
+    if 'Aéroports' in selected_fields:
+        centre_lat = commune.latitude_centre
+        centre_lon = commune.longitude_centre
+        aeroports_proches = []
         
+        for aeroport in Aeroport.objects.all():
+            distance = haversine(centre_lat, centre_lon, aeroport.latitude_aeroport, aeroport.longitude_aeroport)
+            if distance <= 50000:  # 30 km
+                aeroports_proches.append({
+                    'nom': aeroport.nom,
+                    'latitude_aeroport': aeroport.latitude_aeroport,
+                    'longitude_aeroport': aeroport.longitude_aeroport,
+                    'code_oaci': aeroport.code_oaci,
+                    'code_iata': aeroport.code_iata,
+                })
+        aeroports_data = aeroports_proches
+        #print(aeroports_data)    
+
+
     context = {
         'commune': commune,
         'popup_content': popup_content,
+        'aeroports_data': aeroports_data
     }
+    print("Aéroports envoyés au template:", aeroports_data if 'aeroports_data' in locals() else "Pas de données")
+
     return render(request, 'visualisation/map.html', context)
+    #return render(request, 'visualisation/map.html', {'aeroports_data': aeroports_data})
 
 def population_pie_chart_view(request, commune_id):
     # Récupérer la commune sélectionnée

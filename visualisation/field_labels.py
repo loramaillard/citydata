@@ -75,4 +75,5 @@ field_labels = {
     "score_croissance_entrepreneuriale": "Score de croissance entrepreneuriale",
     "longitude_centre": "Longitude du centre",
     "latitude_centre": "Latitude du centre",
+    "Aéroports":"Aéroports à proximité",
 }

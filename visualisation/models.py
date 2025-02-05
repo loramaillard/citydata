@@ -80,3 +80,14 @@ class Commune(models.Model):
 
     def __str__(self):
         return self.libgeo
+
+class Aeroport(models.Model):
+    nom = models.CharField(max_length=255)
+    code_oaci = models.CharField(max_length=10, blank=True, null=True)
+    code_iata = models.CharField(max_length=10, blank=True, null=True)
+    latitude_aeroport = models.FloatField()
+    longitude_aeroport = models.FloatField()
+    ville = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.nom

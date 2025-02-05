@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -34,11 +35,24 @@
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
+	L.control.scale({
+    position: 'bottomleft',  // Position de l'échelle (bottomleft, bottomright, topleft, topright)
+    imperial: false,         // Désactive les miles (système impérial)
+    metric: true             // Active le système métrique (kilomètres)
+}).addTo(map);
 
         // Ajouter le popup avec les données sélectionnées
         var popupContent = `{{ popup_content|safe }}`;
         var marker = L.marker([{{ commune.latitude_centre }}, {{ commune.longitude_centre }}]).addTo(map);
         marker.bindPopup(popupContent).openPopup();
+
+        {% if aeroports_data %}
+            {% for aeroport in aeroports_data %}
+                L.marker([{{ aeroport.latitude_aeroport }}, {{ aeroport.longitude_aeroport }}], {icon: L.icon({iconUrl: "{% static 'images/airport.png' %}", iconSize: [40, 40]})})
+                .addTo(map)
+		.bindPopup("<b>{{ aeroport.nom }}</b><br>OACI: {{ aeroport.code_oaci|default:'N/A' }}<br>IATA: {{ aeroport.code_iata|default:'N/A' }}").openPopup();
+            {% endfor %}
+        {% endif %}
     </script>
     
 </body>
