@@ -75,5 +75,8 @@ field_labels = {
     "score_croissance_entrepreneuriale": "Score de croissance entrepreneuriale",
     "longitude_centre": "Longitude du centre",
     "latitude_centre": "Latitude du centre",
-    "Aéroports":"Aéroports à proximité",
+    "Aéroports":"Aéroports à proximité (<50 km)",
+    "centrales": "Centrales nucléaires à proximité (<50 km)",
+    "hopitaux": "Hôpitaux à proximité (<5 km)",
+    "ecoles": "Etablissements scolaires (de la commune)"
 }

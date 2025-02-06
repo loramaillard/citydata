@@ -1,0 +1,57 @@
+Centrale,Combustible,Sous-filière,Date de mise en service industrielle,Puissance installée (MW),Puissance minimum de conception (MW),Réserve secondaire maximale (MW),Région,Département,Commune,latitude_centre,longitude_centre
+BELLEVILLE 1,Uranium Enrichi,Réacteur à eau pressurisée (REP) 1300,1988-06-01,1310,260,60,CENTRE-VAL DE LOIRE,CHER,Belleville-sur-Loire,47.508946,2.875676
+BELLEVILLE 2,Uranium Enrichi,Réacteur à eau pressurisée (REP) 1300,1989-01-01,1310,260,60,CENTRE-VAL DE LOIRE,CHER,Belleville-sur-Loire,47.508946,2.875676
+BLAYAIS 1,Multi-oxyde d’uranium et de plutonium,Réacteur à eau pressurisée (REP) 900,1981-12-01,910,180,40,NOUVELLE-AQUITAINE,GIRONDE,Braud-et-Saint-Louis,45.257605,-0.690606
+BLAYAIS 2,Multi-oxyde d’uranium et de plutonium,Réacteur à eau pressurisée (REP) 900,1983-02-01,910,180,40,NOUVELLE-AQUITAINE,GIRONDE,Braud-et-Saint-Louis,45.257605,-0.690606
+BLAYAIS 3,Uranium Enrichi,Réacteur à eau pressurisée (REP) 900,1983-11-14,910,180,40,NOUVELLE-AQUITAINE,GIRONDE,Braud-et-Saint-Louis,45.257605,-0.690606
+BLAYAIS 4,Uranium Enrichi,Réacteur à eau pressurisée (REP) 900,1983-10-01,910,180,40,NOUVELLE-AQUITAINE,GIRONDE,Braud-et-Saint-Louis,45.257605,-0.690606
+BUGEY 2,Uranium Enrichi,Réacteur à eau pressurisée (REP) 900,1979-03-01,910,180,25,AUVERGNE-RHONE-ALPES,AIN,Saint-Vulbas,45.801148,5.266072
+BUGEY 3,Uranium Enrichi,Réacteur à eau pressurisée (REP) 900,1979-03-01,910,180,25,AUVERGNE-RHONE-ALPES,AIN,Saint-Vulbas,45.801148,5.266072
+BUGEY 4,Uranium Enrichi,Réacteur à eau pressurisée (REP) 900,1979-07-01,880,180,25,AUVERGNE-RHONE-ALPES,AIN,Saint-Vulbas,45.801148,5.266072
+BUGEY 5,Uranium Enrichi,Réacteur à eau pressurisée (REP) 900,1980-01-03,880,180,25,AUVERGNE-RHONE-ALPES,AIN,Saint-Vulbas,45.801148,5.266072
+CATTENOM 1,Uranium Enrichi,Réacteur à eau pressurisée (REP) 1300,1987-04-01,1300,260,60,GRAND EST,MOSELLE,Cattenom,49.415953,6.218271
+CATTENOM 2,Uranium Enrichi,Réacteur à eau pressurisée (REP) 1300,1988-02-01,1300,260,60,GRAND EST,MOSELLE,Cattenom,49.415953,6.218271
+CATTENOM 3,Uranium Enrichi,Réacteur à eau pressurisée (REP) 1300,1991-02-01,1300,260,60,GRAND EST,MOSELLE,Cattenom,49.415953,6.218271
+CATTENOM 4,Uranium Enrichi,Réacteur à eau pressurisée (REP) 1300,1992-01-01,1300,260,60,GRAND EST,MOSELLE,Cattenom,49.415953,6.218271
+CHINON B 1,Multi-oxyde d’uranium et de plutonium,Réacteur à eau pressurisée (REP) 900,1984-02-01,905,180,40,CENTRE-VAL DE LOIRE,INDRE-ET-LOIRE,Avoine,47.228727,0.168307
+CHINON B 2,Multi-oxyde d’uranium et de plutonium,Réacteur à eau pressurisée (REP) 900,1984-08-01,905,180,40,CENTRE-VAL DE LOIRE,INDRE-ET-LOIRE,Avoine,47.228727,0.168307
+CHINON B 3,Multi-oxyde d’uranium et de plutonium,Réacteur à eau pressurisée (REP) 900,1987-03-04,905,180,40,CENTRE-VAL DE LOIRE,INDRE-ET-LOIRE,Avoine,47.228727,0.168307
+CHINON B 4,Multi-oxyde d’uranium et de plutonium,Réacteur à eau pressurisée (REP) 900,1988-04-01,905,180,40,CENTRE-VAL DE LOIRE,INDRE-ET-LOIRE,Avoine,47.228727,0.168307
+CHOOZ B 1,Uranium Enrichi,Réacteur à eau pressurisée (REP) 1450,2000-05-15,1500,370,30,GRAND EST,ARDENNES,Chooz,50.090344,4.789588
+CHOOZ B 2,Uranium Enrichi,Réacteur à eau pressurisée (REP) 1450,2000-09-29,1500,370,30,GRAND EST,ARDENNES,Chooz,50.090344,4.789588
+CIVAUX 1,Uranium Enrichi,Réacteur à eau pressurisée (REP) 1450,2002-01-29,1495,370,30,NOUVELLE-AQUITAINE,VIENNE,Civaux,46.46218,0.648879
+CIVAUX 2,Uranium Enrichi,Réacteur à eau pressurisée (REP) 1450,2002-04-23,1495,370,30,NOUVELLE-AQUITAINE,VIENNE,Civaux,46.46218,0.648879
+CRUAS 1,Uranium Enrichi,Réacteur à eau pressurisée (REP) 900,1984-04-02,915,180,40,AUVERGNE-RHONE-ALPES,ARDECHE,Cruas,44.63283,4.750824
+CRUAS 2,Uranium Enrichi,Réacteur à eau pressurisée (REP) 900,1985-04-01,915,180,40,AUVERGNE-RHONE-ALPES,ARDECHE,Cruas,44.63283,4.750824
+CRUAS 3,Uranium Enrichi,Réacteur à eau pressurisée (REP) 900,1984-09-10,915,180,40,AUVERGNE-RHONE-ALPES,ARDECHE,Cruas,44.63283,4.750824
+CRUAS 4,Uranium Enrichi,Réacteur à eau pressurisée (REP) 900,1985-02-11,915,180,40,AUVERGNE-RHONE-ALPES,ARDECHE,Cruas,44.63283,4.750824
+DAMPIERRE 1,Multi-oxyde d’uranium et de plutonium,Réacteur à eau pressurisée (REP) 900,1980-09-10,890,180,40,CENTRE-VAL DE LOIRE,LOIRET,Dampierre-en-Burly,47.732638,2.517824
+DAMPIERRE 2,Multi-oxyde d’uranium et de plutonium,Réacteur à eau pressurisée (REP) 900,1981-02-16,890,180,40,CENTRE-VAL DE LOIRE,LOIRET,Dampierre-en-Burly,47.732638,2.517824
+DAMPIERRE 3,Multi-oxyde d’uranium et de plutonium,Réacteur à eau pressurisée (REP) 900,1981-05-27,890,180,40,CENTRE-VAL DE LOIRE,LOIRET,Dampierre-en-Burly,47.732638,2.517824
+DAMPIERRE 4,Multi-oxyde d’uranium et de plutonium,Réacteur à eau pressurisée (REP) 900,1981-11-20,890,180,40,CENTRE-VAL DE LOIRE,LOIRET,Dampierre-en-Burly,47.732638,2.517824
+FLAMANVILLE 1,Uranium Enrichi,Réacteur à eau pressurisée (REP) 1300,1986-12-01,1330,260,60,NORMANDIE,MANCHE,Flamanville,49.535986,-1.883342
+FLAMANVILLE 2,Uranium Enrichi,Réacteur à eau pressurisée (REP) 1300,1987-03-09,1330,260,60,NORMANDIE,MANCHE,Flamanville,49.535986,-1.883342
+GOLFECH 1,Uranium Enrichi,Réacteur à eau pressurisée (REP) 1300,1991-02-01,1310,260,60,OCCITANIE,TARN-ET-GARONNE,Golfech,44.105751,0.84572
+GOLFECH 2,Uranium Enrichi,Réacteur à eau pressurisée (REP) 1300,1994-03-04,1310,260,60,OCCITANIE,TARN-ET-GARONNE,Golfech,44.105751,0.84572
+GRAVELINES 1,Multi-oxyde d’uranium et de plutonium,Réacteur à eau pressurisée (REP) 900,1980-11-25,910,180,40,HAUTS-DE-FRANCE,NORD,Gravelines,51.012846,2.139287
+GRAVELINES 2,Multi-oxyde d’uranium et de plutonium,Réacteur à eau pressurisée (REP) 900,1980-12-01,910,180,40,HAUTS-DE-FRANCE,NORD,Gravelines,51.012846,2.139287
+GRAVELINES 3,Multi-oxyde d’uranium et de plutonium,Réacteur à eau pressurisée (REP) 900,1981-06-01,910,180,40,HAUTS-DE-FRANCE,NORD,Gravelines,51.012846,2.139287
+GRAVELINES 4,Multi-oxyde d’uranium et de plutonium,Réacteur à eau pressurisée (REP) 900,1981-10-01,910,180,40,HAUTS-DE-FRANCE,NORD,Gravelines,51.012846,2.139287
+GRAVELINES 5,Uranium Enrichi,Réacteur à eau pressurisée (REP) 900,1985-01-15,910,180,40,HAUTS-DE-FRANCE,NORD,Gravelines,51.012846,2.139287
+GRAVELINES 6,Multi-oxyde d’uranium et de plutonium,Réacteur à eau pressurisée (REP) 900,1985-10-25,910,180,40,HAUTS-DE-FRANCE,NORD,Gravelines,51.012846,2.139287
+NOGENT 1,Uranium Enrichi,Réacteur à eau pressurisée (REP) 1300,1988-02-24,1310,260,60,GRAND EST,AUBE,Nogent-sur-Seine,48.514581,3.524182
+NOGENT 2,Uranium Enrichi,Réacteur à eau pressurisée (REP) 1300,1989-05-01,1310,260,60,GRAND EST,AUBE,Nogent-sur-Seine,48.514581,3.524182
+PALUEL 1,Uranium Enrichi,Réacteur à eau pressurisée (REP) 1300,1985-12-01,1330,260,60,NORMANDIE,SEINE-MARITIME,Paluel,49.858754,0.634759
+PALUEL 2,Uranium Enrichi,Réacteur à eau pressurisée (REP) 1300,1985-12-01,1330,260,60,NORMANDIE,SEINE-MARITIME,Paluel,49.858754,0.634759
+PALUEL 3,Uranium Enrichi,Réacteur à eau pressurisée (REP) 1300,1986-02-01,1330,260,60,NORMANDIE,SEINE-MARITIME,Paluel,49.858754,0.634759
+PALUEL 4,Uranium Enrichi,Réacteur à eau pressurisée (REP) 1300,1986-06-01,1330,260,60,NORMANDIE,SEINE-MARITIME,Paluel,49.858754,0.634759
+PENLY 1,Uranium Enrichi,Réacteur à eau pressurisée (REP) 1300,1990-12-01,1330,260,60,NORMANDIE,SEINE-MARITIME,Petit-Caux,49.976144,1.210236
+PENLY 2,Uranium Enrichi,Réacteur à eau pressurisée (REP) 1300,1992-11-01,1330,260,60,NORMANDIE,SEINE-MARITIME,Petit-Caux,49.976144,1.210236
+ST-ALBAN 1,Uranium Enrichi,Réacteur à eau pressurisée (REP) 1300,1986-05-01,1335,260,60,AUVERGNE-RHONE-ALPES,ISERE,Saint-Maurice-l'Exil,45.405445,4.755573
+ST-ALBAN 2,Uranium Enrichi,Réacteur à eau pressurisée (REP) 1300,1987-03-01,1335,260,60,AUVERGNE-RHONE-ALPES,ISERE,Saint-Maurice-l'Exil,45.405445,4.755573
+ST-LAURENT B 1,Multi-oxyde d’uranium et de plutonium,Réacteur à eau pressurisée (REP) 900,1983-08-01,915,180,40,CENTRE-VAL DE LOIRE,LOIR-ET-CHER,Saint-Laurent-Nouan,47.720248,1.580217
+ST-LAURENT B 2,Multi-oxyde d’uranium et de plutonium,Réacteur à eau pressurisée (REP) 900,1983-08-01,915,180,40,CENTRE-VAL DE LOIRE,LOIR-ET-CHER,Saint-Laurent-Nouan,47.720248,1.580217
+TRICASTIN 1,Multi-oxyde d’uranium et de plutonium,Réacteur à eau pressurisée (REP) 900,1980-12-01,915,180,40,AUVERGNE-RHONE-ALPES,DROME,Saint-Paul-Trois-Châteaux,44.326355,4.731541
+TRICASTIN 2,Multi-oxyde d’uranium et de plutonium,Réacteur à eau pressurisée (REP) 900,1980-12-01,915,180,40,AUVERGNE-RHONE-ALPES,DROME,Saint-Paul-Trois-Châteaux,44.326355,4.731541
+TRICASTIN 3,Multi-oxyde d’uranium et de plutonium,Réacteur à eau pressurisée (REP) 900,1981-05-11,915,180,40,AUVERGNE-RHONE-ALPES,DROME,Saint-Paul-Trois-Châteaux,44.326355,4.731541
+TRICASTIN 4,Multi-oxyde d’uranium et de plutonium,Réacteur à eau pressurisée (REP) 900,1981-11-01,915,180,40,AUVERGNE-RHONE-ALPES,DROME,Saint-Paul-Trois-Châteaux,44.326355,4.731541

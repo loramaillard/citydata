@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Commune, Aeroport
+from .models import Commune, Aeroport, Centrale, Hopital, Ecole
 from .field_labels import field_labels
 from django.http import HttpResponse
 import math
@@ -32,16 +32,22 @@ def select_data_view(request, commune_id):
     excluded_fields = ['id', 'libgeo','codgeo','p21_pop0014','p21_pop1529','p21_pop3044','p21_pop4559'
                        ,'p21_pop6074','p21_pop7589','p21_pop90p','nombre_crime', 'latitude_centre', 'longitude_centre']
 
-    # Filtrer les champs avec des valeurs non nulles ou non NaN
     valid_fields = {
-        field: getattr(commune, field)
-        
-        for field in fields 
-        if field not in excluded_fields and
-        getattr(commune, field) not in [None, '', float('nan'),0] and 
-        not (isinstance(getattr(commune, field), float) and math.isnan(getattr(commune, field)))
+    "Aéroports": 0,
+    "centrales": 0,
+    "hopitaux": 0,
+    "ecoles": 0,
     }
-    valid_fields["Aéroports"] = 0
+
+    # Filtrer les champs avec des valeurs non nulles ou non NaN
+    valid_fields.update({
+    field: getattr(commune, field)
+    for field in fields
+    if field not in excluded_fields and
+    getattr(commune, field) not in [None, '', float('nan'), 0] and 
+    not (isinstance(getattr(commune, field), float) and math.isnan(getattr(commune, field)))
+    })
+
 
     valid_fields_1 = {}
     for key in valid_fields.keys():
@@ -66,6 +72,9 @@ def haversine(lat1, lon1, lat2, lon2):
     a = sin(dlat / 2)**2 + cos(radians(lat1)) * cos(radians(lat2)) * sin(dlon / 2)**2
     c = 2 * atan2(sqrt(a), sqrt(1 - a))
     return R * c  # Distance en mètres
+
+from collections import defaultdict
+
 
 
 def map_view(request, commune_id):
@@ -96,7 +105,7 @@ def map_view(request, commune_id):
         
         for aeroport in Aeroport.objects.all():
             distance = haversine(centre_lat, centre_lon, aeroport.latitude_aeroport, aeroport.longitude_aeroport)
-            if distance <= 50000:  # 30 km
+            if distance <= 50000:  # 50 km
                 aeroports_proches.append({
                     'nom': aeroport.nom,
                     'latitude_aeroport': aeroport.latitude_aeroport,
@@ -107,16 +116,75 @@ def map_view(request, commune_id):
         aeroports_data = aeroports_proches
         #print(aeroports_data)    
 
+    centrales_data = []
+    if 'centrales' in selected_fields:
+        centre_lat = commune.latitude_centre
+        centre_lon = commune.longitude_centre
+
+        # Grouper les centrales par leurs coordonnées exactes
+        centrales_grouped = defaultdict(list)
+        for centrale in Centrale.objects.all():
+            distance = haversine(centre_lat, centre_lon, centrale.latitude_centrale, centrale.longitude_centrale)
+            if distance <= 50000:  # Rayon de 50 km
+                key = (centrale.latitude_centrale, centrale.longitude_centrale)
+                centrales_grouped[key].append(centrale)
+
+        offset = 0.002  # Décalage léger pour éviter la superposition (~30m)
+        
+        # Appliquer le décalage aux centrales qui ont les mêmes coordonnées
+        for (lat, lon), centrales_list in centrales_grouped.items():
+            for i, centrale in enumerate(centrales_list):
+                centrales_data.append({
+                    'nom': centrale.nom,
+                    'latitude_centrale': lat + (i * offset),  # Décalage progressif
+                    'longitude_centrale': lon + (i * offset),
+                    'combustible': centrale.combustible,
+                    'puissance_installee': centrale.puissance_installee,
+                    'date_mise_en_service': centrale.date_mise_en_service.strftime('%Y-%m-%d'), 
+                    'sous_filiere': centrale.sous_filiere,
+                    'reserve_secondaire': centrale.reserve_secondaire
+                })
+
+    # Hôpitaux proches
+    hopitaux_data = []
+    if 'hopitaux' in selected_fields:
+        centre_lat = commune.latitude_centre
+        centre_lon = commune.longitude_centre
+
+        for hopital in Hopital.objects.all():
+            distance = haversine(centre_lat, centre_lon, hopital.latitude_hopital, hopital.longitude_hopital)
+            if distance <= 5000:  # Rayon de 1 km
+                hopitaux_data.append({
+                    'nom': hopital.nom,
+                    'latitude_hopital': hopital.latitude_hopital,
+                    'longitude_hopital': hopital.longitude_hopital,
+                })
+
+    ecoles_data = []
+    if 'ecoles' in selected_fields:  # Vérifier si l'utilisateur veut afficher les écoles
+        ecoles = Ecole.objects.filter(nom_commune=commune.libgeo)  # Filtrer par la commune
+
+        for ecole in ecoles:
+            ecoles_data.append({
+                'nom': ecole.nom,
+                'latitude_ecole': ecole.latitude_ecole,
+                'longitude_ecole': ecole.longitude_ecole,
+                'secteur': ecole.secteur,
+                'nature': ecole.nature,
+                'nom_commune': ecole.nom_commune,
+            })
 
     context = {
         'commune': commune,
         'popup_content': popup_content,
-        'aeroports_data': aeroports_data
+        'aeroports_data': aeroports_data, 
+        'centrales_data': centrales_data,
+        'hopitaux_data':hopitaux_data,
+        'ecoles_data':ecoles_data,
     }
-    print("Aéroports envoyés au template:", aeroports_data if 'aeroports_data' in locals() else "Pas de données")
+    #print("ecoles envoyés au template:", ecoles_data if 'ecoles_data' in locals() else "Pas de données")
 
     return render(request, 'visualisation/map.html', context)
-    #return render(request, 'visualisation/map.html', {'aeroports_data': aeroports_data})
 
 def population_pie_chart_view(request, commune_id):
     # Récupérer la commune sélectionnée

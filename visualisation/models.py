@@ -91,3 +91,46 @@ class Aeroport(models.Model):
 
     def __str__(self):
         return self.nom
+
+from django.db import models
+
+class Centrale(models.Model):
+    nom = models.CharField(max_length=255)
+    combustible = models.CharField(max_length=255)
+    sous_filiere = models.CharField(max_length=255)
+    date_mise_en_service = models.DateField()
+    puissance_installee = models.FloatField()
+    puissance_minimum = models.FloatField()
+    reserve_secondaire = models.FloatField()
+    region = models.CharField(max_length=255)
+    departement = models.CharField(max_length=255)
+    commune = models.CharField(max_length=255)
+    latitude_centrale = models.FloatField()
+    longitude_centrale = models.FloatField()
+
+    def __str__(self):
+        return self.nom
+
+
+class Hopital(models.Model):
+    nom = models.CharField(max_length=255, null=True, blank=True)
+    latitude_hopital = models.FloatField()
+    longitude_hopital = models.FloatField()
+
+    def __str__(self):
+        return self.nom if self.nom else "Hôpital sans nom"
+    
+
+
+class Ecole(models.Model):
+    nom = models.CharField(max_length=255)
+    latitude_ecole = models.FloatField()
+    longitude_ecole = models.FloatField()
+    secteur = models.CharField(max_length=50, blank=True, null=True)
+    nature = models.CharField(max_length=100, blank=True, null=True)
+    nom_commune = models.CharField(max_length=100)  # 🔹 Nouveau champ
+
+    def __str__(self):
+        return f"{self.nom} - {self.nom_commune}"
+
+
