@@ -163,7 +163,6 @@ def map_view(request, commune_id):
     ecoles_data = []
     if 'ecoles' in selected_fields:  # Vérifier si l'utilisateur veut afficher les écoles
         ecoles = Ecole.objects.filter(nom_commune=commune.libgeo)  # Filtrer par la commune
-
         for ecole in ecoles:
             ecoles_data.append({
                 'nom': ecole.nom,
@@ -172,6 +171,7 @@ def map_view(request, commune_id):
                 'secteur': ecole.secteur,
                 'nature': ecole.nature,
                 'nom_commune': ecole.nom_commune,
+                
             })
 
     context = {
