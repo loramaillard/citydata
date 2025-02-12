@@ -1,0 +1,196 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+/* Navigation Links */
+.navigation-links {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.navigation-links a {
+    padding: 10px 15px;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    display: inline-block;
+    transition: background 0.3s;
+}
+
+.navigation-links a:hover {
+    background-color: #0056b3;
+}
+
+/* Map Styling */
+#map {
+    flex-grow: 1;
+    width: 100%;
+    min-height: 400px;
+    border-radius: 8px;
+    margin-top: 10px;
+    border: 2px solid #000000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Search Page */
+.search-box {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+/* Input field */
+.search-box input {
+    width: 200px;
+    height: 17px;
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Search button */
+.search-box button {
+    height: 40px;
+    padding: 10px 15px;
+    font-size: 16px;
+    color: white;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.search-box button:hover {
+    background-color: #0056b3;
+}
+
+/* Results title */
+.results-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+/* Results list */
+.results-list {
+    list-style: none;
+    padding: 0;
+    max-width: 500px;
+    margin: auto;
+}
+
+/* Links in the results */
+.results-list a {
+    display: block;
+    padding: 10px;
+    font-size: 18px;
+    text-decoration: none;
+    color: #1e5600;
+    transition: color 0.3s;
+}
+
+.results-list a:hover {
+    color: #7bca05;
+    text-decoration: underline;
+}
+
+/* Checkbox List */
+.checkbox-list {
+    margin: auto;
+    list-style: none;
+    padding: 0;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    color: #444;
+    padding: 5px 0;
+}
+
+/* Buttons */
+.button-group {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+.btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.submit-btn {
+    background-color: #17a2b8;
+    color: white;
+    margin-right: auto;
+}
+
+.submit-btn:hover {
+    background-color: #138496;
+}
+
+.select-all-btn {
+    background-color: #28a745;
+    color: white;
+    margin-left: auto;
+}
+
+.select-all-btn:hover {
+    background-color: #218838;
+}
+
+.btn-back {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    display: inline-block;
+    padding: 10px 15px;
+    background: #28a745;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+/* Chart */
+.chart-container img {
+    max-width: 100%;
+    height: auto;
+}

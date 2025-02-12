@@ -1,28 +1,36 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recherche de Ville</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
-    <h1>Recherche de Ville</h1>
-    <form method="get">
-        <input type="text" name="query" placeholder="Entrez une ville" value="{{ query }}">
-        <button type="submit">Rechercher</button>
-    </form>
-
-    {% if communes %}
-        <h2>Résultats :</h2>
-        <ul>
-            {% for commune in communes %}
-                <li>
-                    <a href="{% url 'visualisation:select_data' commune.id %}">{{ commune.libgeo }} ({{ commune.codgeo }})</a>
-                </li>
-            {% endfor %}
-        </ul>
-    {% elif query %}
-        <p>Aucune ville trouvée pour "{{ query }}"</p>
-    {% endif %}
+    <div class="container">
+        <h1>🔎 Recherche de Ville</h1>
+        <form method="get" class="search-box">
+            <input type="text" name="query" placeholder="Entrez une ville..." value="{{ query }}" class="search-box">
+            <button type="submit" class="search-btn">Rechercher</button>
+        </form>
+        
+        {% if communes %}
+        <div class="container" style="background: rgb(183, 253, 126);">
+            <h2 class="results-title">Résultats :</h2>
+            <ul class="results-list">
+                {% for commune in communes %}
+                    <li>
+                        <a href="{% url 'visualisation:select_data' commune.id %}">{{ commune.libgeo }} ({{ commune.codgeo }})</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% elif query %}
+            <p class="no-results">⚠️ Aucune ville trouvée pour "{{ query }}"</p>
+        {% endif %}
+    </div>
 </body>
 </html>
+

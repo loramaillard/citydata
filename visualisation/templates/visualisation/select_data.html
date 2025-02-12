@@ -1,25 +1,41 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Choisir les données pour {{ commune.libgeo }}</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
-    <h1>Choisissez les données pour {{ commune.libgeo }}</h1>
+    <h1>📊 Choisissez les données pour {{ commune.libgeo }}</h1>
     <form method="post">
         {% csrf_token %}
-        <ul>
+        <ul class="checkbox-list">
             {% for key, value in valid_fields.items %}
                 <li>   
-                    <label>
-                        <input type="checkbox" name="data_fields" value="{{ key }}">
+                    <label class="checkbox-label">
+                        <input type="checkbox" class="data-checkbox" name="data_fields" value="{{ key }}">
                         {{ value }}                    
                     </label>
-               </li>
+                </li>
             {% endfor %}
         </ul>
-        <button type="submit">Afficher sur la carte</button>
+
+        <div class="button-group">
+            <button type="button" class="btn select-all-btn" onclick="selectAllCheckboxes()">Tout sélectionner</button>
+            <button type="submit" class="btn submit-btn">Afficher sur la carte</button>
+        </div>
     </form>
+
+    <script>
+        function selectAllCheckboxes() {
+            const checkboxes = document.querySelectorAll('.data-checkbox');
+            const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
+            
+            checkboxes.forEach(checkbox => checkbox.checked = !allChecked);
+        }
+    </script>
+
 </body>
 </html>

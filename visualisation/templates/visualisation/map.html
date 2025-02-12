@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carte Interactive pour {{ commune.libgeo }}</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+	<link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <style>
             .inline-links a {
@@ -21,14 +22,16 @@
     </style>
 </head>
 <body>
-    <h1>Carte Interactive pour {{ commune.libgeo }}</h1>
-    <div class="inline-links">
-        <a href="{% url 'visualisation:search_view' %}">Revenir à la recherche</a>
-        <a href="{% url 'visualisation:select_data' commune.id %}">Revenir à la sélection des données</a>       
-        <a href="{% url 'visualisation:population_pie_chart' commune.id %}">Voir la répartition de la population par âge</a>
+<div class="container" style="background:rgb(241, 240, 224);">	
+	<h1 class="page-title">Carte Interactive pour {{ commune.libgeo }}</h1>
+    <div class="navigation-links">
+        <a href="{% url 'visualisation:search_view' %}">🔍 Revenir à la recherche</a>
+        <a href="{% url 'visualisation:select_data' commune.id %}">📊 Revenir à la sélection des données</a>       
+        <a href="{% url 'visualisation:population_pie_chart' commune.id %}">👥 Voir la répartition de la population par âge</a>
 
     </div>
-    <div id="map" style="width: 100%; height: 500px;"></div>
+    <div id="map" style="width: 100%; height: 70vh;"></div>
+</div>
     <script>
         var map = L.map('map').setView([{{ commune.latitude_centre }}, {{ commune.longitude_centre }}], 12);
 
