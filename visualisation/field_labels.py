@@ -77,6 +77,10 @@ field_labels = {
     "latitude_centre": "Latitude du centre",
     "Aéroports":"Aéroports à proximité (<50 km)",
     "centrales": "Centrales nucléaires à proximité (<50 km)",
-    "hopitaux": "Hôpitaux à proximité (<5 km)",
-    "ecoles": "Etablissements scolaires (de la commune)"
+    "hopitaux": "Hôpitaux",
+    "ecoles": "Etablissements scolaires", 
+    "ehpads": "Maisons de retraite",
+    "pharmacies":"Pharmacies",
+    "docteurs": "Docteurs", 
 }
+

@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Commune, Aeroport, Centrale, Hopital, Ecole
 from .field_labels import field_labels
+from .services import get_ecoles_from_api, get_sante_from_api
 from django.http import HttpResponse
 import math
 from django.urls import reverse
@@ -33,10 +34,14 @@ def select_data_view(request, commune_id):
                        ,'p21_pop6074','p21_pop7589','p21_pop90p','nombre_crime', 'latitude_centre', 'longitude_centre']
 
     valid_fields = {
+    "ecoles": 0,
     "Aéroports": 0,
     "centrales": 0,
     "hopitaux": 0,
-    "ecoles": 0,
+    "ehpads":0,
+    "pharmacies":0,
+    "docteurs":0,   
+
     }
 
     # Filtrer les champs avec des valeurs non nulles ou non NaN
@@ -148,31 +153,49 @@ def map_view(request, commune_id):
     # Hôpitaux proches
     hopitaux_data = []
     if 'hopitaux' in selected_fields:
-        centre_lat = commune.latitude_centre
-        centre_lon = commune.longitude_centre
+        hopitaux_data = get_sante_from_api(commune.libgeo, "hospital")
 
-        for hopital in Hopital.objects.all():
-            distance = haversine(centre_lat, centre_lon, hopital.latitude_hopital, hopital.longitude_hopital)
-            if distance <= 5000:  # Rayon de 1 km
-                hopitaux_data.append({
-                    'nom': hopital.nom,
-                    'latitude_hopital': hopital.latitude_hopital,
-                    'longitude_hopital': hopital.longitude_hopital,
-                })
+    ehpad_data = []
+    if 'ehpads' in selected_fields:
+        ehpad_data = get_sante_from_api(commune.libgeo, "nursing_home")
+    
+    pharmacies_data = []
+    if 'pharmacies' in selected_fields:
+        pharmacies_data = get_sante_from_api(commune.libgeo, "pharmacy")
 
+    docteurs_data = []
+    if 'docteurs' in selected_fields:
+        docteurs_data = get_sante_from_api(commune.libgeo, "doctors")
+
+    # hopitaux_data = []
+    # if 'hopitaux' in selected_fields:
+    #     centre_lat = commune.latitude_centre
+    #     centre_lon = commune.longitude_centre
+    # 
+    #     for hopital in Hopital.objects.all():
+    #         distance = haversine(centre_lat, centre_lon, hopital.latitude_hopital, hopital.longitude_hopital)
+    #         if distance <= 5000:  # Rayon de 1 km
+    #             hopitaux_data.append({
+    #                 'nom': hopital.nom,
+    #                 'latitude_hopital': hopital.latitude_hopital,
+    #                 'longitude_hopital': hopital.longitude_hopital,
+    #             })
     ecoles_data = []
-    if 'ecoles' in selected_fields:  # Vérifier si l'utilisateur veut afficher les écoles
-        ecoles = Ecole.objects.filter(nom_commune=commune.libgeo)  # Filtrer par la commune
-        for ecole in ecoles:
-            ecoles_data.append({
-                'nom': ecole.nom,
-                'latitude_ecole': ecole.latitude_ecole,
-                'longitude_ecole': ecole.longitude_ecole,
-                'secteur': ecole.secteur,
-                'nature': ecole.nature,
-                'nom_commune': ecole.nom_commune,
-                
-            })
+    if 'ecoles' in selected_fields:  
+        ecoles_data = get_ecoles_from_api(commune.libgeo)
+    # ecoles_data = []
+    # if 'ecoles' in selected_fields:  # Vérifier si l'utilisateur veut afficher les écoles
+    #     ecoles = Ecole.objects.filter(nom_commune=commune.libgeo)  # Filtrer par la commune
+    #     for ecole in ecoles:
+    #         ecoles_data.append({
+    #             'nom': ecole.nom,
+    #             'latitude_ecole': ecole.latitude_ecole,
+    #             'longitude_ecole': ecole.longitude_ecole,
+    #             'secteur': ecole.secteur,
+    #             'nature': ecole.nature,
+    #             'nom_commune': ecole.nom_commune,
+    #         })
+
 
     context = {
         'commune': commune,
@@ -181,6 +204,9 @@ def map_view(request, commune_id):
         'centrales_data': centrales_data,
         'hopitaux_data':hopitaux_data,
         'ecoles_data':ecoles_data,
+        'ehpad_data':ehpad_data,
+        'pharmacies_data':pharmacies_data,
+        'docteurs_data':docteurs_data,
     }
     #print("ecoles envoyés au template:", ecoles_data if 'ecoles_data' in locals() else "Pas de données")
 

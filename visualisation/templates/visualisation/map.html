@@ -36,10 +36,10 @@
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 	L.control.scale({
-    position: 'bottomleft',  // Position de l'échelle (bottomleft, bottomright, topleft, topright)
-    imperial: false,         // Désactive les miles (système impérial)
-    metric: true             // Active le système métrique (kilomètres)
-}).addTo(map);
+    	position: 'bottomleft',  // Position de l'échelle (bottomleft, bottomright, topleft, topright)
+    	imperial: false,         // Désactive les miles (système impérial)
+    	metric: true             // Active le système métrique (kilomètres)
+	}).addTo(map);
 
         // Ajouter le popup avec les données sélectionnées
         var popupContent = `{{ popup_content|safe }}`;
@@ -59,31 +59,59 @@
             {% for centrale in centrales_data %}
                 L.marker([{{ centrale.latitude_centrale }}, {{ centrale.longitude_centrale }}], {icon: L.icon({iconUrl: "{% static 'images/nuclear.png' %}", iconSize: [40, 40]})})
                 .addTo(map)
-		.bindPopup("<b>{{ centrale.nom }}</b><br>Combustible :{{ centrale.combustible }}<br>Sous filière :{{ centrale.sous_filiere }}<br>Puissance : {{ centrale.puissance_installee }} MW<br>Réserve secondaire : {{ centrale.reserve_secondaire }} MW<br>Date de mise en service :{{ centrale.date_mise_en_service }}").openPopup();
+		.bindPopup("<b>{{ centrale.nom }}</b><br>Combustible :{{ centrale.combustible }}<br>Sous filière :{{ centrale.sous_filiere }}<br>Puissance : {{ centrale.puissance_installee }} MW<br>Réserve secondaire : {{ centrale.reserve_secondaire }} MW<br>Date de mise en service : {{ centrale.date_mise_en_service }}").openPopup();
             {% endfor %}
         {% endif %}
+
 	var hopitaux_data = {{ hopitaux_data|safe }};
-	console.log("Hôpitaux récupérés :", hopitaux_data);
-	var hospitalIcon = L.icon({
-    iconUrl: '/static/images/hospital.png',
-    iconSize: [25, 25]
-});
-	hopitaux_data.forEach(function(hopital) {
-    	var marker = L.marker([hopital.latitude_hopital, hopital.longitude_hopital], {icon: hospitalIcon})
-        .addTo(map)
-        .bindPopup("<b>" + hopital.nom + "</b>");
-});
+	var hospitalIcon = L.icon({ iconUrl: '/static/images/hospital.png', iconSize: [25, 25]});
+	hopitaux_data.forEach(function(hopital) {	
+    		var marker = L.marker([hopital.latitude, hopital.longitude], {icon: hospitalIcon}).addTo(map)
+		var popupContent = "<b>" + hopital.nom + "</b><br>";
+       			  if (hopital.finess && hopital.finess !== "N/A") popupContent += "<b>FINESS :</b> " + hopital.finess +"<br>";
+       			  if (hopital.telephone && hopital.telephone !== "Non renseigné") popupContent +="<b>Téléphone 📞:</b> " + hopital.telephone + "<br>";
+        		  if (hopital.horaires && hopital.horaires !== "Non renseigné") popupContent +="<b>Horaires 🕒 :</b> " + hopital.horaires+ "<br>";
+        		  if (hopital.accessibilite && hopital.accessibilite !== "Non renseigné") popupContent +="<b>Accès handicapés :</b> " + 					hopital.accessibilite  +"<br>";
+        		 popupContent +="<a href='" + hopital.lien_osm + "' target='_blank'>Voir sur OSM</a>";
+
+        	L.marker([hopital.latitude, hopital.longitude], {icon: hospitalIcon})
+			.addTo(map)
+			.bindPopup(popupContent);
+	});
+
+
+	var ehpad_data = {{ ehpad_data|safe }};
+	var ehpadIcon = L.icon({ iconUrl: '/static/images/nursing-home.png', iconSize: [25, 25]});
+	ehpad_data.forEach(function(ehpad) {	
+    		var marker = L.marker([ehpad.latitude, ehpad.longitude], {icon: ehpadIcon})
+        	.addTo(map)
+        	.bindPopup("<b>" + ehpad.nom + "</b>");});
+
+	var pharmacies_data = {{ pharmacies_data|safe }};
+	var pharmacieIcon = L.icon({ iconUrl: '/static/images/pharmacy (2).png', iconSize: [25, 25]});
+	pharmacies_data.forEach(function(pharmacie) {	
+    		var marker = L.marker([pharmacie.latitude, pharmacie.longitude], {icon: pharmacieIcon})
+        	.addTo(map)
+        	.bindPopup("<b>" + pharmacie.nom + "</b>");});
+
+
+	var docteurs_data = {{ docteurs_data|safe }};
+	var docteurIcon = L.icon({ iconUrl: '/static/images/doctor.png', iconSize: [25, 25]});
+	docteurs_data.forEach(function(docteur) {	
+    		var marker = L.marker([docteur.latitude, docteur.longitude], {icon: docteurIcon})
+        	.addTo(map)
+        	.bindPopup("<b>" + docteur.nom + "</b>");});
+
+
 	// Ajouter les écoles sur la carte
         var ecoles_data = {{ ecoles_data | safe }}; 
-	var ecoleIcon = L.icon({
-    iconUrl: '/static/images/school.png',
-    iconSize: [25, 25]
-});
-
+	var ecoleIcon = L.icon({ iconUrl: '/static/images/school.png', iconSize: [25, 25]});
         ecoles_data.forEach(function(ecole) { var marker = L.marker([ecole.latitude_ecole, ecole.longitude_ecole], {icon: ecoleIcon})
         .addTo(map)
-        .bindPopup("<b>" + ecole.nom + "</b><br>Secteur : " + (ecole.secteur || 'Non défini') + "</br>").openPopup();            
-       });
+        .bindPopup("<b>" + ecole.nom + "</b><br>Secteur : " + (ecole.secteur || 'Non défini') + "</br>").openPopup();        
+        });
+
+
     </script>
     
 </body>
