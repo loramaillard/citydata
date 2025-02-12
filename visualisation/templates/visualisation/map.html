@@ -55,6 +55,7 @@
             {% endfor %}
         {% endif %}
 
+	// ajout centrales
 	{% if centrales_data %}
             {% for centrale in centrales_data %}
                 L.marker([{{ centrale.latitude_centrale }}, {{ centrale.longitude_centrale }}], {icon: L.icon({iconUrl: "{% static 'images/nuclear.png' %}", iconSize: [40, 40]})})
@@ -63,10 +64,11 @@
             {% endfor %}
         {% endif %}
 
+	// ajout données santé
 	var hopitaux_data = {{ hopitaux_data|safe }};
 	var hospitalIcon = L.icon({ iconUrl: '/static/images/hospital.png', iconSize: [25, 25]});
 	hopitaux_data.forEach(function(hopital) {	
-    		var marker = L.marker([hopital.latitude, hopital.longitude], {icon: hospitalIcon}).addTo(map)
+    		// var marker = L.marker([hopital.latitude, hopital.longitude], {icon: hospitalIcon}).addTo(map)
 		var popupContent = "<b>" + hopital.nom + "</b><br>";
        			  if (hopital.finess && hopital.finess !== "N/A") popupContent += "<b>FINESS :</b> " + hopital.finess +"<br>";
        			  if (hopital.telephone && hopital.telephone !== "Non renseigné") popupContent +="<b>Téléphone 📞:</b> " + hopital.telephone + "<br>";
@@ -83,24 +85,49 @@
 	var ehpad_data = {{ ehpad_data|safe }};
 	var ehpadIcon = L.icon({ iconUrl: '/static/images/nursing-home.png', iconSize: [25, 25]});
 	ehpad_data.forEach(function(ehpad) {	
-    		var marker = L.marker([ehpad.latitude, ehpad.longitude], {icon: ehpadIcon})
-        	.addTo(map)
-        	.bindPopup("<b>" + ehpad.nom + "</b>");});
+    		// var marker = L.marker([ehpad.latitude, ehpad.longitude], {icon: ehpadIcon}).addTo(map)
+		var popupContent = "<b>" + ehpad.nom + "</b><br>";
+       			  if (ehpad.finess && ehpad.finess !== "N/A") popupContent += "<b>FINESS :</b> " + ehpad.finess +"<br>";
+       			  if (ehpad.telephone && ehpad.telephone !== "Non renseigné") popupContent +="<b>Téléphone 📞:</b> " + ehpad.telephone + "<br>";
+        		  if (ehpad.horaires && ehpad.horaires !== "Non renseigné") popupContent +="<b>Horaires 🕒 :</b> " + ehpad.horaires+ "<br>";
+        		  if (ehpad.accessibilite && ehpad.accessibilite !== "Non renseigné") popupContent +="<b>Accès handicapés :</b> " + 					ehpad.accessibilite  +"<br>";
+        		 popupContent +="<a href='" + ehpad.lien_osm + "' target='_blank'>Voir sur OSM</a>";
+
+        	L.marker([ehpad.latitude, ehpad.longitude], {icon: ehpadIcon})
+			.addTo(map)
+			.bindPopup(popupContent);
+	});
 
 	var pharmacies_data = {{ pharmacies_data|safe }};
 	var pharmacieIcon = L.icon({ iconUrl: '/static/images/pharmacy (2).png', iconSize: [25, 25]});
 	pharmacies_data.forEach(function(pharmacie) {	
-    		var marker = L.marker([pharmacie.latitude, pharmacie.longitude], {icon: pharmacieIcon})
-        	.addTo(map)
-        	.bindPopup("<b>" + pharmacie.nom + "</b>");});
+		var popupContent = "<b>" + pharmacie.nom + "</b><br>";
+       			  if (pharmacie.finess && pharmacie.finess !== "N/A") popupContent += "<b>FINESS :</b> " + pharmacie.finess +"<br>";
+       			  if (pharmacie.telephone && pharmacie.telephone !== "Non renseigné") popupContent +="<b>Téléphone 📞:</b> " + pharmacie.telephone + "<br>";
+        		  if (pharmacie.horaires && pharmacie.horaires !== "Non renseigné") popupContent +="<b>Horaires 🕒 :</b> " + pharmacie.horaires+ "<br>";
+        		  if (pharmacie.accessibilite && pharmacie.accessibilite !== "Non renseigné") popupContent +="<b>Accès handicapés :</b> " + 					pharmacie.accessibilite  +"<br>";
+        		 popupContent +="<a href='" + pharmacie.lien_osm + "' target='_blank'>Voir sur OSM</a>";
+
+        	L.marker([pharmacie.latitude, pharmacie.longitude], {icon: pharmacieIcon})
+			.addTo(map)
+			.bindPopup(popupContent);
+	});
 
 
 	var docteurs_data = {{ docteurs_data|safe }};
 	var docteurIcon = L.icon({ iconUrl: '/static/images/doctor.png', iconSize: [25, 25]});
 	docteurs_data.forEach(function(docteur) {	
-    		var marker = L.marker([docteur.latitude, docteur.longitude], {icon: docteurIcon})
-        	.addTo(map)
-        	.bindPopup("<b>" + docteur.nom + "</b>");});
+		var popupContent = "<b>" + docteur.nom + "</b><br>";
+       			  if (docteur.finess && docteur.finess !== "N/A") popupContent += "<b>FINESS :</b> " + docteur.finess +"<br>";
+       			  if (docteur.telephone && docteur.telephone !== "Non renseigné") popupContent +="<b>Téléphone 📞:</b> " + docteur.telephone + "<br>";
+        		  if (docteur.horaires && docteur.horaires !== "Non renseigné") popupContent +="<b>Horaires 🕒 :</b> " + docteur.horaires+ "<br>";
+        		  if (docteur.accessibilite && docteur.accessibilite !== "Non renseigné") popupContent +="<b>Accès handicapés :</b> " + 					docteur.accessibilite  +"<br>";
+        		 popupContent +="<a href='" + docteur.lien_osm + "' target='_blank'>Voir sur OSM</a>";
+
+        	L.marker([docteur.latitude, docteur.longitude], {icon: docteurIcon})
+			.addTo(map)
+			.bindPopup(popupContent);
+	});
 
 
 	// Ajouter les écoles sur la carte
