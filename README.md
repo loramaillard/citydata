@@ -32,8 +32,8 @@ git add .
 
 git commit -m "Description des modifications"
 
-git push origin nom_de_la_branche (main si pas de branches)
+git push origin main 
 
 ### Récupérer les mises à jour du projet
-
+git checkout -- db.sqlite3 : remplace la version locale par celle du dernier commit
 git pull origin main
