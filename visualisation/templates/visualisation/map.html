@@ -5,9 +5,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carte Interactive pour {{ commune.libgeo }}</title>
+
+    <!-- CSS Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-	<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+    <!-- CSS Leaflet Control Geocoder -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+
+    <!-- CSS personnalisé -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+    <!-- Script Leaflet -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <!-- Script Leaflet Control Geocoder -->
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
     <style>
             .inline-links a {
                 display: inline-block;
@@ -44,10 +57,21 @@
     	metric: true             // Active le système métrique (kilomètres)
 	}).addTo(map);
 
-        // Ajouter le popup avec les données sélectionnées
-        var popupContent = `{{ popup_content|safe }}`;
+	// Ajouter le bouton de recherche à la carte
+	L.Control.geocoder({
+    		defaultMarkGeocode: false
+	}).on('markgeocode', function(e) {
+    		var latlng = e.geocode.center;
+    		map.setView(latlng, 15); // Zoom sur l'adresse trouvée
+    		L.marker(latlng).addTo(map) // Ajouter un marqueur à l'adresse
+        		.bindPopup(e.geocode.name)
+        		.openPopup();
+	}).addTo(map);
+
+        // Ajouter le popup avec les données sélectionnées	
+	var popupContent = `{{ popup_content|safe }}`;
         var marker = L.marker([{{ commune.latitude_centre }}, {{ commune.longitude_centre }}]).addTo(map);
-        marker.bindPopup(popupContent).openPopup();
+        marker.bindPopup(popupContent, { maxHeight: 250 }).openPopup();
 	
 	// ajouter aéroports
         {% if aeroports_data %}
