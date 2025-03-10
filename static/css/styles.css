@@ -29,7 +29,7 @@ body {
     margin-bottom: 20px;
 }
 
-.navigation-links a {
+.navigation-links a, .radius-container {
     padding: 10px 15px;
     border-radius: 5px;
     background-color: #007bff;
@@ -43,6 +43,7 @@ body {
 .navigation-links a:hover {
     background-color: #0056b3;
 }
+
 
 /* Map Styling */
 #map {

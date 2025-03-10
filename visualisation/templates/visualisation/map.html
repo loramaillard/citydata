@@ -1,4 +1,5 @@
 {% load static %}
+{% csrf_token %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,6 +22,8 @@
     <!-- Script Leaflet Control Geocoder -->
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
+	
+
     <style>
             .inline-links a {
                 display: inline-block;
@@ -41,7 +44,11 @@
         <a href="{% url 'visualisation:search_view' %}">🔍 Revenir à la recherche</a>
         <a href="{% url 'visualisation:select_data' commune.id %}">📊 Revenir à la sélection des données</a>       
         <a href="{% url 'visualisation:population_pie_chart' commune.id %}">👥 Voir la répartition de la population par âge</a>
-
+		<a class="radius-container">
+			<label for="radius">Rayon (km) :</label>
+			<input type="number" id="radius" value="5" min="0.5" max="50" step="0.5" style="width: 50px;">
+		</a>
+	
     </div>
     <div id="map" style="width: 100%; height: 70vh;"></div>
 </div>
@@ -51,119 +58,193 @@
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
-	L.control.scale({
-    	position: 'bottomleft',  // Position de l'échelle (bottomleft, bottomright, topleft, topright)
-    	imperial: false,         // Désactive les miles (système impérial)
-    	metric: true             // Active le système métrique (kilomètres)
-	}).addTo(map);
+		L.control.scale({
+    		position: 'bottomleft',  // Position de l'échelle (bottomleft, bottomright, topleft, topright)
+    		imperial: false,         // Désactive les miles (système impérial)
+    		metric: true             // Active le système métrique (kilomètres)
+		}).addTo(map);
 
-	// Ajouter le bouton de recherche à la carte
-	L.Control.geocoder({
-    		defaultMarkGeocode: false
-	}).on('markgeocode', function(e) {
-    		var latlng = e.geocode.center;
-    		map.setView(latlng, 15); // Zoom sur l'adresse trouvée
-    		L.marker(latlng).addTo(map) // Ajouter un marqueur à l'adresse
-        		.bindPopup(e.geocode.name)
-        		.openPopup();
-	}).addTo(map);
+		// Créer un groupe de calques pour stocker les marqueurs
+		var poiLayerGroup = L.layerGroup().addTo(map);
+
+		function clearPOIMarkers() {
+			poiLayerGroup.clearLayers(); // Supprime tous les marqueurs du groupe
+		}
+		
+		var circle; // Déclaration globale du cercle pour le modifier ensuite
+		var markers = [];
+
+		var geocoder = L.Control.geocoder({
+			defaultMarkGeocode: false
+		}).on('markgeocode', function(e) {
+			var latlng = e.geocode.center;
+			var radius = document.getElementById("radius").value * 1000; // Convertir en mètres si l'entrée est en km
+
+			map.setView(latlng, 15); // Zoom sur l'adresse trouvée
+			
+			// Supprimer l'ancien marqueur et cercle s'ils existent
+			if (circle) {
+				map.removeLayer(circle);
+			}
+
+			L.marker(latlng).addTo(map) // Ajouter un marqueur à l'adresse
+				.bindPopup(e.geocode.name)
+				.openPopup();
+
+			// Dessiner le cercle
+			circle = L.circle(latlng, {
+				color: '#007bff',
+				fillColor: '#007bff',
+				fillOpacity: 0.2,
+				radius: radius
+			}).addTo(map);
+
+			// Filtrer les POI
+			updateFilteredPOIs(latlng, radius);
+		}).addTo(map);
+
+		function updateFilteredPOIs(center, radius) {
+			poiLayerGroup.eachLayer(function(marker) {
+				var markerPos = marker.getLatLng();
+				var distance = map.distance(center, markerPos);
+
+				if (distance <= radius) {
+					if (!map.hasLayer(marker)) {
+						marker.addTo(map); // Afficher le POI si dans le cercle
+					}
+				} else {
+					map.removeLayer(marker); // Cacher le POI s'il est hors du cercle
+				}
+			});
+		}
+
+
+		document.getElementById("radius").addEventListener("change", function() {
+			if (circle) {
+				var newRadius = this.value * 1000; // Convertir km en mètres
+				circle.setRadius(newRadius);
+				updateFilteredPOIs(circle.getLatLng(), newRadius);
+			}
+		});
+
+
 
         // Ajouter le popup avec les données sélectionnées	
-	var popupContent = `{{ popup_content|safe }}`;
-        var marker = L.marker([{{ commune.latitude_centre }}, {{ commune.longitude_centre }}]).addTo(map);
-        marker.bindPopup(popupContent, { maxHeight: 250 }).openPopup();
+		var popupContent = `{{ popup_content|safe }}`;
+    	    var marker = L.marker([{{ commune.latitude_centre }}, {{ commune.longitude_centre }}]).addTo(map);
+    	    marker.bindPopup(popupContent, { maxHeight: 250 }).openPopup();
 	
-	// ajouter aéroports
+		// ajouter aéroports
         {% if aeroports_data %}
             {% for aeroport in aeroports_data %}
-                L.marker([{{ aeroport.latitude_aeroport }}, {{ aeroport.longitude_aeroport }}], {icon: L.icon({iconUrl: "{% static 'images/airport.png' %}", iconSize: [40, 40]})})
+                var marker = L.marker([{{ aeroport.latitude_aeroport }}, {{ aeroport.longitude_aeroport }}], {icon: L.icon({iconUrl: "{% static 'images/airport.png' %}", iconSize: [40, 40]})})
                 .addTo(map)
-		.bindPopup("<b>{{ aeroport.nom }}</b><br>OACI: {{ aeroport.code_oaci|default:'N/A' }}<br>IATA: {{ aeroport.code_iata|default:'N/A' }}").openPopup();
-            {% endfor %}
+				.bindPopup("<b>{{ aeroport.nom }}</b><br>OACI: {{ aeroport.code_oaci|default:'N/A' }}<br>IATA: {{ aeroport.code_iata|default:'N/A' }}").openPopup();
+			poiLayerGroup.addLayer(marker); // Ajouter au groupe
+			{% endfor %}
         {% endif %}
 
-	// ajout centrales
-	{% if centrales_data %}
-            {% for centrale in centrales_data %}
-                L.marker([{{ centrale.latitude_centrale }}, {{ centrale.longitude_centrale }}], {icon: L.icon({iconUrl: "{% static 'images/nuclear.png' %}", iconSize: [40, 40]})})
-                .addTo(map)
-		.bindPopup("<b>{{ centrale.nom }}</b><br>Combustible :{{ centrale.combustible }}<br>Sous filière :{{ centrale.sous_filiere }}<br>Puissance : {{ centrale.puissance_installee }} MW<br>Réserve secondaire : {{ centrale.reserve_secondaire }} MW<br>Date de mise en service : {{ centrale.date_mise_en_service }}").openPopup();
-            {% endfor %}
-        {% endif %}
+		// ajout centrales
+		{% if centrales_data %}
+				{% for centrale in centrales_data %}
+					var marker = L.marker([{{ centrale.latitude_centrale }}, {{ centrale.longitude_centrale }}], {icon: L.icon({iconUrl: "{% static 'images/nuclear.png' %}", iconSize: [40, 40]})})
+					.addTo(map)
+					.bindPopup("<b>{{ centrale.nom }}</b><br>Combustible :{{ centrale.combustible }}<br>Sous filière :{{ centrale.sous_filiere }}<br>Puissance : {{ centrale.puissance_installee }} MW<br>Réserve secondaire : {{ centrale.reserve_secondaire }} MW<br>Date de mise en service : {{ centrale.date_mise_en_service }}").openPopup();
+					poiLayerGroup.addLayer(marker);
+				{% endfor %}
+		{% endif %}
 
-	// ajout données santé
-	var hopitaux_data = {{ hopitaux_data|safe }};
-	var hospitalIcon = L.icon({ iconUrl: '/static/images/hospital.png', iconSize: [25, 25]});
-	hopitaux_data.forEach(function(hopital) {	
-    		// var marker = L.marker([hopital.latitude, hopital.longitude], {icon: hospitalIcon}).addTo(map)
-		var popupContent = "<b>" + hopital.nom + "</b><br>";
-       			  if (hopital.finess && hopital.finess !== "N/A") popupContent += "<b>FINESS :</b> " + hopital.finess +"<br>";
-       			  if (hopital.telephone && hopital.telephone !== "Non renseigné") popupContent +="<b>Téléphone 📞:</b> " + hopital.telephone + "<br>";
-        		  if (hopital.horaires && hopital.horaires !== "Non renseigné") popupContent +="<b>Horaires 🕒 :</b> " + hopital.horaires+ "<br>";
-        		  if (hopital.accessibilite && hopital.accessibilite !== "Non renseigné") popupContent +="<b>Accès handicapés :</b> " + 					hopital.accessibilite  +"<br>";
-        		 popupContent +="<a href='" + hopital.lien_osm + "' target='_blank'>Voir sur OSM</a>";
+		// ajout données santé
+		var hopitaux_data = {{ hopitaux_data|safe }};
+		var hospitalIcon = L.icon({ iconUrl: '/static/images/hospital.png', iconSize: [25, 25]});
+		hopitaux_data.forEach(function(hopital) {	
+			var popupContent = "<b>" + hopital.nom + "</b><br>";
+					if (hopital.finess && hopital.finess !== "N/A") popupContent += "<b>FINESS :</b> " + hopital.finess +"<br>";
+					if (hopital.telephone && hopital.telephone !== "Non renseigné") popupContent +="<b>Téléphone 📞:</b> " + hopital.telephone + "<br>";
+					if (hopital.horaires && hopital.horaires !== "Non renseigné") popupContent +="<b>Horaires 🕒 :</b> " + hopital.horaires+ "<br>";
+					if (hopital.accessibilite && hopital.accessibilite !== "Non renseigné") popupContent +="<b>Accès handicapés :</b> " + 					hopital.accessibilite  +"<br>";
+					popupContent +="<a href='" + hopital.lien_osm + "' target='_blank'>Voir sur OSM</a>";
 
-        	L.marker([hopital.latitude, hopital.longitude], {icon: hospitalIcon})
+				var marker = L.marker([hopital.latitude, hopital.longitude], {icon: hospitalIcon})
+				.addTo(map)
+				.bindPopup(popupContent);
+				poiLayerGroup.addLayer(marker);
+		});
+
+
+		var ehpad_data = {{ ehpad_data|safe }};
+		var ehpadIcon = L.icon({ iconUrl: '/static/images/nursing-home.png', iconSize: [25, 25]});
+		ehpad_data.forEach(function(ehpad) {	
+			var popupContent = "<b>" + ehpad.nom + "</b><br>";
+					if (ehpad.finess && ehpad.finess !== "N/A") popupContent += "<b>FINESS :</b> " + ehpad.finess +"<br>";
+					if (ehpad.telephone && ehpad.telephone !== "Non renseigné") popupContent +="<b>Téléphone 📞:</b> " + ehpad.telephone + "<br>";
+					if (ehpad.horaires && ehpad.horaires !== "Non renseigné") popupContent +="<b>Horaires 🕒 :</b> " + ehpad.horaires+ "<br>";
+					if (ehpad.accessibilite && ehpad.accessibilite !== "Non renseigné") popupContent +="<b>Accès handicapés :</b> " + 					ehpad.accessibilite  +"<br>";
+					popupContent +="<a href='" + ehpad.lien_osm + "' target='_blank'>Voir sur OSM</a>";
+
+				var marker = L.marker([ehpad.latitude, ehpad.longitude], {icon: ehpadIcon})
+				.addTo(map)
+				.bindPopup(popupContent);
+				poiLayerGroup.addLayer(marker);
+		});
+
+		var pharmacies_data = {{ pharmacies_data|safe }};
+		var pharmacieIcon = L.icon({ iconUrl: '/static/images/pharmacy (2).png', iconSize: [25, 25]});
+		pharmacies_data.forEach(function(pharmacie) {	
+			var popupContent = "<b>" + pharmacie.nom + "</b><br>";
+					if (pharmacie.finess && pharmacie.finess !== "N/A") popupContent += "<b>FINESS :</b> " + pharmacie.finess +"<br>";
+					if (pharmacie.telephone && pharmacie.telephone !== "Non renseigné") popupContent +="<b>Téléphone 📞:</b> " + pharmacie.telephone + "<br>";
+					if (pharmacie.horaires && pharmacie.horaires !== "Non renseigné") popupContent +="<b>Horaires 🕒 :</b> " + pharmacie.horaires+ "<br>";
+					if (pharmacie.accessibilite && pharmacie.accessibilite !== "Non renseigné") popupContent +="<b>Accès handicapés :</b> " + 					pharmacie.accessibilite  +"<br>";
+					popupContent +="<a href='" + pharmacie.lien_osm + "' target='_blank'>Voir sur OSM</a>";
+
+				var marker = L.marker([pharmacie.latitude, pharmacie.longitude], {icon: pharmacieIcon})
+				.addTo(map)
+				.bindPopup(popupContent);
+				poiLayerGroup.addLayer(marker);
+		});
+
+
+		var docteurs_data = {{ docteurs_data|safe }};
+		var docteurIcon = L.icon({ iconUrl: '/static/images/doctor.png', iconSize: [25, 25]});
+		docteurs_data.forEach(function(docteur) {	
+			var popupContent = "<b>" + docteur.nom + "</b><br>";
+					if (docteur.finess && docteur.finess !== "N/A") popupContent += "<b>FINESS :</b> " + docteur.finess +"<br>";
+					if (docteur.telephone && docteur.telephone !== "Non renseigné") popupContent +="<b>Téléphone 📞:</b> " + docteur.telephone + "<br>";
+					if (docteur.horaires && docteur.horaires !== "Non renseigné") popupContent +="<b>Horaires 🕒 :</b> " + docteur.horaires+ "<br>";
+					if (docteur.accessibilite && docteur.accessibilite !== "Non renseigné") popupContent +="<b>Accès handicapés :</b> " + 					docteur.accessibilite  +"<br>";
+					popupContent +="<a href='" + docteur.lien_osm + "' target='_blank'>Voir sur OSM</a>";
+
+				var marker = L.marker([docteur.latitude, docteur.longitude], {icon: docteurIcon})
+				.addTo(map)
+				.bindPopup(popupContent);
+				poiLayerGroup.addLayer(marker);
+		});
+
+
+		// Ajouter les écoles sur la carte
+		var ecoles_data = {{ ecoles_data | safe }}; 
+		// console.log(ecoles_data);
+		var ecoleIcon = L.icon({ iconUrl: '/static/images/school.png', iconSize: [25, 25]});
+			ecoles_data.forEach(function(ecole) { 
+			    var marker = L.marker([ecole.latitude, ecole.longitude], {icon: ecoleIcon})
+			    .addTo(map)
+			    .bindPopup("<b>" + ecole.nom + "</b><br>Secteur : " + (ecole.secteur || 'Non défini') + "</br>").openPopup(); 
+				poiLayerGroup.addLayer(marker);       
+			});
+
+		// Ajouter les gares sur la carte
+		var gares_data = {{ gares_data | safe }}; 
+		var Icon = L.icon({ iconUrl: '/static/images/train (1).png', iconSize: [35, 35]});
+			gares_data.forEach(function(gare) { var marker = L.marker([gare.latitude, gare.longitude], {icon: Icon})
 			.addTo(map)
-			.bindPopup(popupContent);
-	});
-
-
-	var ehpad_data = {{ ehpad_data|safe }};
-	var ehpadIcon = L.icon({ iconUrl: '/static/images/nursing-home.png', iconSize: [25, 25]});
-	ehpad_data.forEach(function(ehpad) {	
-    		// var marker = L.marker([ehpad.latitude, ehpad.longitude], {icon: ehpadIcon}).addTo(map)
-		var popupContent = "<b>" + ehpad.nom + "</b><br>";
-       			  if (ehpad.finess && ehpad.finess !== "N/A") popupContent += "<b>FINESS :</b> " + ehpad.finess +"<br>";
-       			  if (ehpad.telephone && ehpad.telephone !== "Non renseigné") popupContent +="<b>Téléphone 📞:</b> " + ehpad.telephone + "<br>";
-        		  if (ehpad.horaires && ehpad.horaires !== "Non renseigné") popupContent +="<b>Horaires 🕒 :</b> " + ehpad.horaires+ "<br>";
-        		  if (ehpad.accessibilite && ehpad.accessibilite !== "Non renseigné") popupContent +="<b>Accès handicapés :</b> " + 					ehpad.accessibilite  +"<br>";
-        		 popupContent +="<a href='" + ehpad.lien_osm + "' target='_blank'>Voir sur OSM</a>";
-
-        	L.marker([ehpad.latitude, ehpad.longitude], {icon: ehpadIcon})
-			.addTo(map)
-			.bindPopup(popupContent);
-	});
-
-	var pharmacies_data = {{ pharmacies_data|safe }};
-	var pharmacieIcon = L.icon({ iconUrl: '/static/images/pharmacy (2).png', iconSize: [25, 25]});
-	pharmacies_data.forEach(function(pharmacie) {	
-		var popupContent = "<b>" + pharmacie.nom + "</b><br>";
-       			  if (pharmacie.finess && pharmacie.finess !== "N/A") popupContent += "<b>FINESS :</b> " + pharmacie.finess +"<br>";
-       			  if (pharmacie.telephone && pharmacie.telephone !== "Non renseigné") popupContent +="<b>Téléphone 📞:</b> " + pharmacie.telephone + "<br>";
-        		  if (pharmacie.horaires && pharmacie.horaires !== "Non renseigné") popupContent +="<b>Horaires 🕒 :</b> " + pharmacie.horaires+ "<br>";
-        		  if (pharmacie.accessibilite && pharmacie.accessibilite !== "Non renseigné") popupContent +="<b>Accès handicapés :</b> " + 					pharmacie.accessibilite  +"<br>";
-        		 popupContent +="<a href='" + pharmacie.lien_osm + "' target='_blank'>Voir sur OSM</a>";
-
-        	L.marker([pharmacie.latitude, pharmacie.longitude], {icon: pharmacieIcon})
-			.addTo(map)
-			.bindPopup(popupContent);
-	});
-
-
-	var docteurs_data = {{ docteurs_data|safe }};
-	var docteurIcon = L.icon({ iconUrl: '/static/images/doctor.png', iconSize: [25, 25]});
-	docteurs_data.forEach(function(docteur) {	
-		var popupContent = "<b>" + docteur.nom + "</b><br>";
-       			  if (docteur.finess && docteur.finess !== "N/A") popupContent += "<b>FINESS :</b> " + docteur.finess +"<br>";
-       			  if (docteur.telephone && docteur.telephone !== "Non renseigné") popupContent +="<b>Téléphone 📞:</b> " + docteur.telephone + "<br>";
-        		  if (docteur.horaires && docteur.horaires !== "Non renseigné") popupContent +="<b>Horaires 🕒 :</b> " + docteur.horaires+ "<br>";
-        		  if (docteur.accessibilite && docteur.accessibilite !== "Non renseigné") popupContent +="<b>Accès handicapés :</b> " + 					docteur.accessibilite  +"<br>";
-        		 popupContent +="<a href='" + docteur.lien_osm + "' target='_blank'>Voir sur OSM</a>";
-
-        	L.marker([docteur.latitude, docteur.longitude], {icon: docteurIcon})
-			.addTo(map)
-			.bindPopup(popupContent);
-	});
-
-
-	// Ajouter les écoles sur la carte
-        var ecoles_data = {{ ecoles_data | safe }}; 
-	var ecoleIcon = L.icon({ iconUrl: '/static/images/school.png', iconSize: [25, 25]});
-        ecoles_data.forEach(function(ecole) { var marker = L.marker([ecole.latitude_ecole, ecole.longitude_ecole], {icon: ecoleIcon})
-        .addTo(map)
-        .bindPopup("<b>" + ecole.nom + "</b><br>Secteur : " + (ecole.secteur || 'Non défini') + "</br>").openPopup();        
-        });
+			.bindPopup("<b>" + gare.nom + "</b><br>Voyageurs : " + (gare.voyageurs || 'Non défini') + 
+			"<br>Fret : " + (gare.fret || 'Non défini')+
+			"<br>Code de la ligne : " + (gare.code_ligne || 'Non défini')+
+			"<br>Identifiant de la gare : " + (gare.uic || 'Non défini')+
+			"</br>").openPopup();    
+			poiLayerGroup.addLayer(marker);    
+			});
 
 
     </script>

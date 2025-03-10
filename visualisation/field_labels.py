@@ -82,5 +82,6 @@ field_labels = {
     "ehpads": "Maisons de retraite",
     "pharmacies":"Pharmacies",
     "docteurs": "Docteurs", 
+    "gares":"Gares SNCF",
 }
 

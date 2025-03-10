@@ -1,16 +1,16 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Commune, Aeroport, Centrale, Hopital, Ecole
 from .field_labels import field_labels
-from .services import get_ecoles_from_api, get_sante_from_api
-from django.http import HttpResponse
+from .services import get_ecoles_from_api, get_sante_from_api, get_gares_from_api
+from django.http import HttpResponse, JsonResponse
 import math
 from django.urls import reverse
 import matplotlib.pyplot as plt
 from io import BytesIO
 import base64
 from math import radians, sin, cos, sqrt, atan2
-#from django.contrib.gis.geos import Point
-#from django.contrib.gis.db.models.functions import Distance
+import json
+from collections import defaultdict
 
 def search_view(request):
     query = request.GET.get('query', '')  # Récupérer la recherche de l'utilisateur
@@ -21,18 +21,11 @@ def search_view(request):
     return render(request, 'visualisation/search.html', {'query': query, 'communes': communes})
 
 
-
-
 def select_data_view(request, commune_id):
     commune = get_object_or_404(Commune, pk=commune_id)
 
-    # Récupérer les champs du modèle Commune
-    fields = [field.name for field in Commune._meta.get_fields() if not field.is_relation]
-    
-    # Liste des champs à exclure
-    excluded_fields = ['id', 'libgeo','codgeo','p21_pop0014','p21_pop1529','p21_pop3044','p21_pop4559'
-                       ,'p21_pop6074','p21_pop7589','p21_pop90p','nombre_crime', 'latitude_centre', 'longitude_centre']
-
+    # Liste des types de données affichables
+    #valid_fields = ["ecoles", "Aéroports", "centrales", "hopitaux", "ehpads", "pharmacies", "docteurs", "gares", "Données statistiques"]
     valid_fields = {
     "ecoles": 0,
     "Aéroports": 0,
@@ -41,33 +34,22 @@ def select_data_view(request, commune_id):
     "ehpads":0,
     "pharmacies":0,
     "docteurs":0,   
+    "gares":0,
+    "Données statistiques":0,
 
     }
+    valid_fields = {key: field_labels.get(key, key) for key in valid_fields.keys()}
 
-    # Filtrer les champs avec des valeurs non nulles ou non NaN
-    valid_fields.update({
-    field: getattr(commune, field)
-    for field in fields
-    if field not in excluded_fields and
-    getattr(commune, field) not in [None, '', float('nan'), 0] and 
-    not (isinstance(getattr(commune, field), float) and math.isnan(getattr(commune, field)))
-    })
-
-
-    valid_fields_1 = {}
-    for key in valid_fields.keys():
-        valid_fields_1[key] = field_labels.get(key)
-
-    valid_fields.update(valid_fields_1)    
 
     if request.method == "POST":
-        selected_fields = request.POST.getlist('data_fields')  # Cases sélectionnées
-        request.session['selected_fields'] = selected_fields  # Sauvegarde des champs sélectionnés
+        selected_fields = request.POST.getlist('data_fields')  # Cases cochées par l'utilisateur
+        request.session['selected_fields'] = selected_fields  # Sauvegarde des choix dans la session
         return redirect(reverse('visualisation:map_view', args=[commune_id]))
 
     return render(request, 'visualisation/select_data.html', {
-        'commune': commune,
-        'valid_fields': valid_fields,
+       'commune': commune,
+       'valid_fields': valid_fields,  # Liste des cases disponibles   
+       'field_labels': field_labels, 
     })
 
 def haversine(lat1, lon1, lat2, lon2):
@@ -78,9 +60,6 @@ def haversine(lat1, lon1, lat2, lon2):
     c = 2 * atan2(sqrt(a), sqrt(1 - a))
     return R * c  # Distance en mètres
 
-from collections import defaultdict
-
-
 
 def map_view(request, commune_id):
     commune = get_object_or_404(Commune, pk=commune_id)
@@ -88,19 +67,37 @@ def map_view(request, commune_id):
     # Récupérer les champs sélectionnés depuis la session
     selected_fields = request.session.get('selected_fields', [])
 
-    # Construire le contenu du popup
+    # Construire le contenu du popup si "Données statistiques" est sélectionné
     popup_content = f"<b>{commune.libgeo}</b><br>"
-    for field in selected_fields:
-        value = getattr(commune, field, None)
-        if value is not None:
-            # Arrondir les valeurs numériques
-            if isinstance(value, float):
-                value = round(value, 2)
-            popup_content += f"{field_labels.get(field)}: {value}<br>"
-    # Si aucun champ sélectionné, ajouter un message par défaut
-    if not popup_content:
-        popup_content = "Aucune donnée sélectionnée."
+    if "Données statistiques" in selected_fields:
+        fields = [field.name for field in Commune._meta.get_fields() if not field.is_relation]
 
+        # Liste des champs à exclure
+        excluded_fields = ['id', 'libgeo','codgeo','p21_pop0014','p21_pop1529','p21_pop3044','p21_pop4559'
+                       ,'p21_pop6074','p21_pop7589','p21_pop90p','nombre_crime', 'latitude_centre', 'longitude_centre']
+
+        # Filtrer les champs avec des valeurs non nulles ou non NaN
+        valid_fields={}
+        valid_fields.update({
+        field: getattr(commune, field)
+        for field in fields
+        if field not in excluded_fields and
+        getattr(commune, field) not in [None, '', float('nan'), 0] and 
+        not (isinstance(getattr(commune, field), float) and math.isnan(getattr(commune, field)))
+        })
+    
+        # Construire le contenu du popup
+        for field in valid_fields:
+            value = getattr(commune, field, None)
+            if value is not None:
+                # Arrondir les valeurs numériques
+                if isinstance(value, float):
+                    value = round(value, 2)
+                popup_content += f"{field_labels.get(field)}: {value}<br>"
+        # Si aucun champ sélectionné, ajouter un message par défaut
+        if not popup_content:
+            popup_content = "Aucune donnée sélectionnée."
+    
     aeroports_data=[]
     # Recherche des aéroports si sélectionné
     if 'Aéroports' in selected_fields:
@@ -154,6 +151,7 @@ def map_view(request, commune_id):
     hopitaux_data = []
     if 'hopitaux' in selected_fields:
         hopitaux_data = get_sante_from_api(commune.libgeo, "hospital")
+        hopitaux_data.extend(get_sante_from_api(commune.libgeo, "clinic"))
 
     ehpad_data = []
     if 'ehpads' in selected_fields:
@@ -180,9 +178,11 @@ def map_view(request, commune_id):
     #                 'latitude_hopital': hopital.latitude_hopital,
     #                 'longitude_hopital': hopital.longitude_hopital,
     #             })
+
     ecoles_data = []
     if 'ecoles' in selected_fields:  
         ecoles_data = get_ecoles_from_api(commune.libgeo)
+
     # ecoles_data = []
     # if 'ecoles' in selected_fields:  # Vérifier si l'utilisateur veut afficher les écoles
     #     ecoles = Ecole.objects.filter(nom_commune=commune.libgeo)  # Filtrer par la commune
@@ -196,6 +196,10 @@ def map_view(request, commune_id):
     #             'nom_commune': ecole.nom_commune,
     #         })
 
+    gares_data = []
+    if 'gares' in selected_fields:
+        gares_data = get_gares_from_api(commune.libgeo)
+
 
     context = {
         'commune': commune,
@@ -207,10 +211,12 @@ def map_view(request, commune_id):
         'ehpad_data':ehpad_data,
         'pharmacies_data':pharmacies_data,
         'docteurs_data':docteurs_data,
+        'gares_data':gares_data,
     }
     #print("ecoles envoyés au template:", ecoles_data if 'ecoles_data' in locals() else "Pas de données")
 
     return render(request, 'visualisation/map.html', context)
+
 
 def population_pie_chart_view(request, commune_id):
     # Récupérer la commune sélectionnée
