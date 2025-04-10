@@ -1,4 +1,15 @@
-# citydata
+# City Data
+
+<small>
+<ul>
+  <li>Alan CASASNOVAS</li>
+  <li>Vivien LEINBERGER</li>
+  <li>Neil MAHCER</li>
+  <li>Lora MAILLARD</li>
+  <li>Maxim QUÉNEL</li>
+  <li>Ghadi SALAMEH</li>
+</ul>
+</small>
 
 **Ouvrez un terminal et clonez le projet :**
 
